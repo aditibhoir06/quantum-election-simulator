@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quantum Election Simulator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/static/style.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- ── HEADER ─────────────────────────────────── -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="logo">⚛️ <span>Quantum Election Simulator</span></div>
+      <div class="header-sub"></div>
+    </div>
+  </header>
+
+  <main class="main-layout">
+
+    <!-- ── LEFT PANEL: How It Works ──────────────── -->
+    <aside class="how-it-works">
+      <div class="section-label">How It Works</div>
+
+      <div class="step-card">
+        <div class="step-icon">🌀</div>
+        <div>
+          <div class="step-title">Hadamard Gate</div>
+          <div class="step-desc">
+            Puts each voter (qubit) into superposition — equal chance of
+            voting either candidate. Models a completely undecided voter.
+          </div>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-icon">🔄</div>
+        <div>
+          <div class="step-title">RY Rotation Gate</div>
+          <!-- CHANGED: updated explanation to describe bidirectional influence -->
+          <div class="step-desc">
+            Applies influence as a rotation angle <strong>θ = influence × π</strong>.<br/>
+            <span class="blue-text">Positive (+) → biases toward <strong>Candidate A</strong></span><br/>
+            <span class="red-text">Negative (−) → biases toward <strong>Candidate B</strong></span><br/>
+            Zero → stays 50 / 50.
+          </div>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-icon">🗳️</div>
+        <div>
+          <div class="step-title">Measurement</div>
+          <div class="step-desc">
+            The qubit's superposition collapses to a definite outcome —
+            0 (Candidate A) or 1 (Candidate B). This is the voter's final ballot.
+          </div>
+        </div>
+      </div>
+
+      <!-- Quantum formula table -->
+      <div class="quantum-formula">
+        <div class="formula-label">Quantum Mapping</div>
+        <div class="formula-row">
+          <span class="fkey">|0⟩ → H</span>
+          <span class="fval">Undecided voter</span>
+        </div>
+        <div class="formula-row">
+          <span class="fkey">θ &gt; 0</span>
+          <!-- CHANGED: added both directions -->
+          <span class="fval blue-text">Bias → Candidate A</span>
+        </div>
+        <div class="formula-row">
+          <span class="fkey">θ = 0</span>
+          <span class="fval">Neutral (50 / 50)</span>
+        </div>
+        <div class="formula-row">
+          <span class="fkey">θ &lt; 0</span>
+          <span class="fval red-text">Bias → Candidate B</span>
+        </div>
+        <div class="formula-row">
+          <span class="fkey">Measure</span>
+          <span class="fval">Final vote cast</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ── RIGHT PANEL: Input + Results ──────────── -->
+    <section class="sim-panel">
+
+      <!-- INPUT CARD -->
+      <div class="card" id="input-card">
+        <div class="card-head">
+          <h2>Configure Simulation</h2>
+          <p>Set your parameters and run the quantum election.</p>
+        </div>
+
+        <div class="form-body">
+
+          <!-- Voter count -->
+          <div class="field-group">
+            <label for="voters">Number of Voters
+              <span class="label-hint">(2 – 500)</span>
+            </label>
+            <input type="number" id="voters" value="100" min="2" max="500"/>
+          </div>
+
+          <!-- CHANGED: Bidirectional influence slider -1 to +1 -->
+          <div class="field-group">
+            <label>
+              Influence Strength
+              <span class="live-value" id="inf-display">0.00</span>
+            </label>
+
+            <!-- CHANGED: Updated hint to explain both directions -->
+            <div class="field-hint">
+              Drag left to bias votes toward
+              <strong class="red-text">Candidate B</strong>, or right to bias toward
+              <strong class="blue-text">Candidate A</strong>.
+              Centre (0) is perfectly neutral.
+            </div>
+
+            <!-- CHANGED: Three-label slider row: B | centre marker | A -->
+            <div class="slider-track-wrap">
+              <span class="slider-end-label red-text">← Candidate B<br/><small>Full bias</small></span>
+              <div class="slider-center-wrap">
+                <input type="range" id="influence" min="-1" max="1" step="0.01" value="0"/>
+                <div class="center-tick"></div>
+              </div>
+              <span class="slider-end-label blue-text" style="text-align:right">Candidate A →<br/><small>Full bias</small></span>
+            </div>
+
+            <!-- CHANGED: neutral label sits below slider centre -->
+            <div class="neutral-label" id="neutral-label">⬤ Neutral — 50 / 50</div>
+
+            <!-- CHANGED: Live bidirectional probability bar -->
+            <div class="prob-preview">
+              <div class="prob-bar-wrap">
+                <!-- B bar grows from LEFT, A bar grows from RIGHT -->
+                <div class="prob-bar bar-b-left" id="bar-b-preview"></div>
+                <div class="prob-bar bar-a-right" id="bar-a-preview"></div>
+              </div>
+              <div class="prob-labels">
+                <span class="red-text">B: <strong id="prob-b-label">50%</strong></span>
+                <span style="color:#94a3b8;font-size:0.75rem">← probability split →</span>
+                <span class="blue-text">A: <strong id="prob-a-label">50%</strong></span>
+              </div>
+            </div>
+
+          </div><!-- end field-group -->
+
+          <button class="run-btn" id="run-btn" onclick="runSimulation()">
+            <span id="btn-label">⚡ Run Quantum Simulation</span>
+          </button>
+
+        </div>
+      </div><!-- end input card -->
+
+      <!-- RESULTS CARD (hidden until simulation runs) -->
+      <div class="card results-card" id="results-card" style="display:none">
+
+        <!-- Winner banner -->
+        <div class="winner-banner" id="winner-banner">
+          <span class="trophy">🏆</span>
+          <div>
+            <div class="winner-tag">Winner</div>
+            <div class="winner-name" id="winner-name">—</div>
+          </div>
+          <!-- CHANGED: shows bias direction label -->
+          <div class="bias-tag" id="bias-tag"></div>
+        </div>
+
+        <!-- Vote summary boxes -->
+        <div class="vote-summary">
+          <div class="vote-box box-a" id="box-a">
+            <div class="vb-label blue-text">Candidate A</div>
+            <div class="vb-count" id="votes-a">—</div>
+            <div class="vb-pct blue-text" id="pct-a">—</div>
+            <div class="vb-bar-wrap">
+              <div class="vb-bar vbar-a" id="vbar-a"></div>
+            </div>
+          </div>
+          <div class="vote-divider">VS</div>
+          <div class="vote-box box-b" id="box-b">
+            <div class="vb-label red-text">Candidate B</div>
+            <div class="vb-count" id="votes-b">—</div>
+            <div class="vb-pct red-text" id="pct-b">—</div>
+            <div class="vb-bar-wrap">
+              <div class="vb-bar vbar-b" id="vbar-b"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bar chart -->
+        <div class="chart-wrap">
+          <canvas id="voteChart" height="160"></canvas>
+        </div>
+
+        <!-- CHANGED: Quantum explanation uses actual theta + bias direction -->
+        <div class="result-explain" id="result-explain"></div>
+
+      </div><!-- end results card -->
+
+    </section>
+  </main>
+
+  <footer class="site-footer">
+   Academic project — not for actual elections
+  </footer>
+
+</div><!-- end .page -->
+
+<script>
+  // ── Slider live preview ──────────────────────────────────────────
+  const slider    = document.getElementById('influence');
+  const infDisp   = document.getElementById('inf-display');
+  const barBprev  = document.getElementById('bar-b-preview');
+  const barAprev  = document.getElementById('bar-a-preview');
+  const probBLbl  = document.getElementById('prob-b-label');
+  const probALbl  = document.getElementById('prob-a-label');
+  const neutralLbl = document.getElementById('neutral-label');
+
+  function calcProbs(influence) {
+    // CHANGED: full quantum math for bidirectional RY gate
+    // After H then RY(theta):
+    //   P(A=0) = cos²(π/4 + theta/2)
+    //   P(B=1) = sin²(π/4 + theta/2)
+    const theta = influence * Math.PI;
+    const angle = Math.PI / 4 + theta / 2;
+    const pA = Math.pow(Math.cos(angle), 2);
+    const pB = 1 - pA;
+    return { pA: Math.round(pA * 100), pB: Math.round(pB * 100) };
+  }
+
+  function updateSlider() {
+    const v   = parseFloat(slider.value);
+    const { pA, pB } = calcProbs(v);
+
+    infDisp.textContent  = (v >= 0 ? '+' : '') + v.toFixed(2);
+    infDisp.className    = 'live-value ' + (v > 0.02 ? 'lv-blue' : v < -0.02 ? 'lv-red' : 'lv-grey');
+
+    // CHANGED: bar-b grows from left, bar-a from right
+    barBprev.style.width = pB + '%';
+    barAprev.style.width = pA + '%';
+    probBLbl.textContent = pB + '%';
+    probALbl.textContent = pA + '%';
+
+    // CHANGED: show/hide neutral label based on position
+    neutralLbl.style.opacity = (Math.abs(v) < 0.03) ? '1' : '0';
+    slider.className = v > 0.02 ? 'thumb-blue' : v < -0.02 ? 'thumb-red' : '';
+
+  }
+
+  slider.addEventListener('input', updateSlider);
+  updateSlider();  // initialise on load
+
+  // ── Chart instance ───────────────────────────────────────────────
+  let chartInstance = null;
+
+  // ── Run simulation ───────────────────────────────────────────────
+  async function runSimulation() {
+    const voters    = parseInt(document.getElementById('voters').value);
+    const influence = parseFloat(slider.value);
+    const btn       = document.getElementById('run-btn');
+    const btnLabel  = document.getElementById('btn-label');
+
+    if (!voters || voters < 2 || voters > 500) {
+      alert('Please enter a number of voters between 2 and 500.');
+      return;
+    }
+
+    btn.disabled         = true;
+    btnLabel.textContent = '⏳ Simulating…';
+
+    try {
+      const res  = await fetch('/simulate', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ voters, influence })
+      });
+      const data = await res.json();
+      showResults(data);
+    } catch (err) {
+      alert('Error: ' + err.message);
+    } finally {
+      btn.disabled         = false;
+      btnLabel.textContent = '⚡ Run Again';
+    }
+  }
+
+  // ── Display results ──────────────────────────────────────────────
+  function showResults(d) {
+    const card = document.getElementById('results-card');
+    card.style.display = 'block';
+    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    // Winner banner + colour
+    document.getElementById('winner-name').textContent = d.winner;
+    const isA = d.winner === 'Candidate A';
+    document.getElementById('winner-banner').className =
+      'winner-banner ' + (isA ? 'winner-a' : 'winner-b');
+
+    // CHANGED: show bias direction in banner
+    document.getElementById('bias-tag').textContent = '⬤ Influence ' + d.bias_direction;
+    document.getElementById('bias-tag').className   =
+      'bias-tag ' + (d.influence > 0.05 ? 'bt-blue' : d.influence < -0.05 ? 'bt-red' : 'bt-grey');
+
+    // Vote boxes
+    document.getElementById('votes-a').textContent = d.votes_a;
+    document.getElementById('votes-b').textContent = d.votes_b;
+    document.getElementById('pct-a').textContent   = d.percent_a + '%';
+    document.getElementById('pct-b').textContent   = d.percent_b + '%';
+    document.getElementById('vbar-a').style.width  = d.percent_a + '%';
+    document.getElementById('vbar-b').style.width  = d.percent_b + '%';
+
+    document.getElementById('box-a').classList.toggle('box-winner', isA);
+    document.getElementById('box-b').classList.toggle('box-winner', !isA);
+
+    // Chart
+    if (chartInstance) chartInstance.destroy();
+    chartInstance = new Chart(document.getElementById('voteChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Candidate A', 'Candidate B'],
+        datasets: [{
+          label: 'Votes',
+          data:  [d.votes_a, d.votes_b],
+          // CHANGED: blue = A, red = B (consistent throughout)
+          backgroundColor: ['rgba(59,130,246,0.2)', 'rgba(239,68,68,0.2)'],
+          borderColor:     ['rgb(59,130,246)',       'rgb(239,68,68)'],
+          borderWidth: 2,
+          borderRadius: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, ticks: { color:'#64748b' }, grid: { color:'#f1f5f9' } },
+          x: { ticks: { color:'#334155', font:{ weight:'600' } }, grid: { display:false } }
+        }
+      }
+    });
+
+    // CHANGED: Explanation includes theta and bias direction
+    const sign = d.influence >= 0 ? '+' : '';
+    document.getElementById('result-explain').innerHTML = `
+      <div class="explain-title">🔬 What happened quantum-mechanically</div>
+      <p>
+        Influence = <strong>${sign}${d.influence}</strong> →
+        RY gate applied rotation <strong>θ = ${d.theta} rad</strong>
+        (<em>${d.bias_direction}</em>).
+      </p>
+      <p>
+        Each of the ${d.total} voter-qubits collapsed on measurement:
+        <strong class="blue-text">${d.votes_a} votes → Candidate A</strong> and
+        <strong class="red-text">${d.votes_b} votes → Candidate B</strong>.
+      </p>
+    `;
+  }
+</script>
+</body>
+</html>

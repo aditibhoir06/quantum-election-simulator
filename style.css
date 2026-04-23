@@ -1,0 +1,295 @@
+/* ================================================================
+   Quantum Election Simulator — Style Sheet
+   CHANGED sections are marked with  CHANGED ↓
+   ================================================================ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:         #f0f4f8;
+  --white:      #ffffff;
+  --border:     #e2e8f0;
+  --text:       #1e293b;
+  --text-2:     #475569;
+  --text-3:     #94a3b8;
+  --blue:       #3b82f6;        /* Candidate A */
+  --blue-light: #eff6ff;
+  --blue-mid:   #bfdbfe;
+  --red:        #ef4444;        /* Candidate B */
+  --red-light:  #fef2f2;
+  --red-mid:    #fecaca;
+  --gold:       #f59e0b;
+  --gold-light: #fffbeb;
+  --grey-mid:   #64748b;
+  --radius:     14px;
+  --radius-sm:  8px;
+  --shadow:     0 2px 16px rgba(0,0,0,0.08);
+}
+
+html { font-size: 16px; }
+body {
+  font-family: 'Outfit', 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* ── Utility colour classes ── */
+.blue-text  { color: var(--blue); }
+.red-text   { color: var(--red);  }
+
+/* ── PAGE ── */
+.page { display: flex; flex-direction: column; min-height: 100vh; }
+
+/* ── HEADER ── */
+.site-header {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+}
+.header-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+}
+.logo { font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.logo span { letter-spacing: -0.02em; }
+.header-sub {
+  font-size: 0.75rem; color: var(--text-3); font-weight: 500;
+  background: #f1f5f9; padding: 4px 12px; border-radius: 100px;
+}
+
+/* ── LAYOUT ── */
+.main-layout {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 28px;
+  max-width: 1100px;
+  margin: 32px auto;
+  padding: 0 28px;
+  width: 100%;
+  align-items: start;
+}
+
+/* ── ASIDE ── */
+.section-label {
+  font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.12em; color: var(--text-3); margin-bottom: 14px;
+}
+.how-it-works {
+  display: flex; flex-direction: column; gap: 10px;
+  position: sticky; top: 28px;
+}
+.step-card {
+  display: flex; gap: 12px;
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 14px 16px;
+}
+.step-icon { font-size: 1.3rem; flex-shrink: 0; margin-top: 1px; }
+.step-title { font-size: 0.88rem; font-weight: 700; margin-bottom: 4px; }
+.step-desc  { font-size: 0.79rem; color: var(--text-2); line-height: 1.65; }
+
+/* CHANGED ↓ formula table shows three rows: +, 0, − */
+.quantum-formula {
+  background: #f8fafc; border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 14px 16px; margin-top: 4px;
+}
+.formula-label {
+  font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--text-3); font-weight: 600; margin-bottom: 10px;
+}
+.formula-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 0.8rem;
+}
+.formula-row:last-child { border-bottom: none; }
+.fkey { font-family: 'Courier New', monospace; font-weight: 700; font-size: 0.82rem; color: var(--text); }
+.fval { color: var(--text-2); }
+
+/* ── CARD ── */
+.sim-panel   { display: flex; flex-direction: column; gap: 20px; }
+.card        { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+.card-head   { padding: 22px 24px 0; margin-bottom: 20px; }
+.card-head h2 { font-size: 1.15rem; font-weight: 700; margin-bottom: 4px; }
+.card-head p  { font-size: 0.84rem; color: var(--text-2); }
+.form-body   { padding: 0 24px 24px; display: flex; flex-direction: column; gap: 22px; }
+
+/* ── FIELDS ── */
+.field-group  { display: flex; flex-direction: column; gap: 7px; }
+.field-group label {
+  font-size: 0.88rem; font-weight: 600; color: var(--text);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.label-hint { font-size: 0.75rem; font-weight: 400; color: var(--text-3); }
+.field-hint { font-size: 0.78rem; color: var(--text-2); line-height: 1.55; }
+
+.field-group input[type="number"] {
+  padding: 10px 14px;
+  border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  font-family: inherit; font-size: 1rem; font-weight: 600;
+  color: var(--text); background: #f8fafc; outline: none;
+  width: 100%; max-width: 200px;
+  transition: border-color 0.2s, background 0.2s;
+}
+.field-group input[type="number"]:focus { border-color: var(--blue); background: var(--white); }
+
+/* CHANGED ↓ live-value colour variants */
+.live-value        { font-size: 1rem; font-weight: 800; }
+.live-value.lv-blue { color: var(--blue); }
+.live-value.lv-red  { color: var(--red);  }
+.live-value.lv-grey { color: var(--grey-mid); }
+
+/* CHANGED ↓ slider wrapper with a centre tick marker */
+.slider-track-wrap {
+  display: flex; align-items: center; gap: 10px; margin-top: 4px;
+}
+.slider-end-label {
+  font-size: 0.72rem; line-height: 1.45; flex-shrink: 0; min-width: 70px;
+}
+.slider-end-label small { font-weight: 600; }
+
+.slider-center-wrap { flex: 1; position: relative; }
+
+/* CHANGED ↓ centre tick line under the slider */
+.center-tick {
+  position: absolute;
+  left: 50%; top: -6px;
+  transform: translateX(-50%);
+  width: 2px; height: 28px;
+  background: var(--text-3);
+  border-radius: 1px;
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+input[type="range"] {
+  width: 100%; display: block;
+  -webkit-appearance: none; appearance: none;
+  height: 5px; background: var(--border); border-radius: 100px; outline: none; cursor: pointer;
+  position: relative; z-index: 1;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 20px; height: 20px;
+  border-radius: 50%; cursor: pointer; transition: box-shadow 0.2s;
+  /* CHANGED ↓ thumb colour changes based on JS class on parent */
+  background: var(--grey-mid);
+  box-shadow: 0 0 0 4px rgba(100,116,139,0.15);
+}
+input[type="range"].thumb-blue::-webkit-slider-thumb { background: var(--blue); box-shadow: 0 0 0 4px var(--blue-light); }
+input[type="range"].thumb-red::-webkit-slider-thumb  { background: var(--red);  box-shadow: 0 0 0 4px var(--red-light);  }
+
+/* CHANGED ↓ neutral centre label that fades in/out */
+.neutral-label {
+  text-align: center; font-size: 0.75rem; color: var(--grey-mid);
+  font-weight: 600; margin-top: 4px;
+  transition: opacity 0.2s;
+}
+
+/* CHANGED ↓ bidirectional probability bar
+   B grows from LEFT, A grows from RIGHT, they meet in the middle */
+.prob-preview  { margin-top: 10px; }
+.prob-bar-wrap {
+  display: flex; height: 10px;
+  border-radius: 100px; overflow: hidden;
+  background: var(--border); margin-bottom: 8px;
+}
+.prob-bar { height: 100%; transition: width 0.15s; }
+.bar-b-left  { background: var(--red);  }   /* B on left  */
+.bar-a-right { background: var(--blue); }   /* A on right */
+
+.prob-labels {
+  display: flex; justify-content: space-between;
+  font-size: 0.78rem; color: var(--text-2);
+}
+.prob-labels strong { color: var(--text); }
+
+/* ── RUN BUTTON ── */
+.run-btn {
+  padding: 14px; background: var(--blue); color: #fff;
+  font-family: inherit; font-size: 1rem; font-weight: 700;
+  border: none; border-radius: var(--radius-sm); cursor: pointer;
+  transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+}
+.run-btn:hover { background: #2563eb; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(59,130,246,0.35); }
+.run-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+/* ── RESULTS ── */
+.results-card { animation: slideIn 0.4s ease both; }
+@keyframes slideIn {
+  from { opacity:0; transform:translateY(14px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* CHANGED ↓ winner banner colours: blue for A, red for B */
+.winner-banner {
+  display: flex; align-items: center; gap: 16px;
+  padding: 20px 24px; border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.winner-a { background: var(--blue-light); }
+.winner-b { background: var(--red-light);  }
+.trophy    { font-size: 2rem; }
+.winner-tag  { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; color: var(--text-3); margin-bottom: 2px; }
+.winner-name { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+.winner-a .winner-name { color: #1d4ed8; }
+.winner-b .winner-name { color: #dc2626; }
+
+/* CHANGED ↓ bias direction tag in winner banner */
+.bias-tag {
+  margin-left: auto; font-size: 0.78rem; font-weight: 600;
+  padding: 5px 12px; border-radius: 100px; border: 1.5px solid;
+}
+.bt-blue { color: var(--blue); border-color: var(--blue-mid); background: var(--blue-light); }
+.bt-red  { color: var(--red);  border-color: var(--red-mid);  background: var(--red-light);  }
+.bt-grey { color: var(--grey-mid); border-color: var(--border); background: #f8fafc; }
+
+/* Vote boxes */
+.vote-summary {
+  display: flex; align-items: center; gap: 12px;
+  padding: 20px 24px; border-bottom: 1px solid var(--border);
+}
+.vote-box {
+  flex: 1; padding: 16px; border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border); background: #f8fafc; text-align: center;
+  transition: border-color 0.3s, background 0.3s;
+}
+/* CHANGED ↓ A = blue border, B = red border */
+.box-a { border-color: var(--blue-mid); }
+.box-b { border-color: var(--red-mid);  }
+.box-winner { border-color: var(--gold) !important; background: var(--gold-light) !important; }
+
+.vb-label  { font-size: 0.78rem; font-weight: 600; margin-bottom: 6px; }
+.vb-count  { font-size: 2.5rem; font-weight: 800; letter-spacing: -0.04em; line-height: 1; margin-bottom: 4px; }
+.vb-pct    { font-size: 1rem; font-weight: 700; margin-bottom: 10px; }
+.vb-bar-wrap { height: 5px; background: var(--border); border-radius: 100px; overflow: hidden; }
+.vb-bar    { height: 100%; border-radius: 100px; transition: width 0.8s ease; }
+.vbar-a    { background: var(--blue); }
+.vbar-b    { background: var(--red);  }
+.vote-divider { font-size: 0.8rem; font-weight: 800; color: var(--text-3); flex-shrink: 0; }
+
+/* Chart + explanation */
+.chart-wrap    { padding: 20px 24px; border-bottom: 1px solid var(--border); }
+.result-explain {
+  padding: 16px 24px; background: #f8fafc;
+}
+.explain-title { font-size: 0.82rem; font-weight: 700; margin-bottom: 6px; }
+.result-explain p { font-size: 0.83rem; color: var(--text-2); line-height: 1.7; margin-bottom: 4px; }
+.result-explain strong { color: var(--text); }
+
+/* ── FOOTER ── */
+.site-footer {
+  text-align: center; padding: 20px;
+  font-size: 0.75rem; color: var(--text-3);
+  border-top: 1px solid var(--border); background: var(--white);
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 720px) {
+  .main-layout { grid-template-columns: 1fr; padding: 0 16px; }
+  .how-it-works { position: static; }
+  .header-sub   { display: none; }
+}
